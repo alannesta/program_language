@@ -8,3 +8,7 @@ python = spawn('python', ['fibo.py'], {
 python.stdout.on('data', function(data) {
 	console.log('stdout: ' + data);
 });
+
+python.on('close', function(code) {
+	console.log('Python process close with code: ' + code)
+});
