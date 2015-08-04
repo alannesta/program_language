@@ -1,0 +1,15 @@
+{
+  "name": "language benchmark",
+  "description": "language benchmark",
+  "version": "0.0.1",
+  "private": false,
+  "author": "alan",
+  "scripts": {
+    "start": "grunt",
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    
+  }
+}
