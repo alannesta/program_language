@@ -45,4 +45,4 @@ t1 = Time.now
 # puts fibo.fibo(40)	# using instance method
 puts FiboTest.fibo(40)	# using class method
 t2 = Time.now
-puts "Time elapsed #{t2-t1}"
+puts "Ruby: Time elapsed #{t2-t1}"

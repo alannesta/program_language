@@ -19,7 +19,7 @@ def fibo(n):
 def main():
 	now = time.time()
 	print(fibo(35))
-	print 'Time elapsed: {0} milli seconds'.format((time.time() - now)*1000)
+	print 'Python: Time elapsed: {0} milli seconds'.format((time.time() - now)*1000)
 
 if __name__ == "__main__":
 	main()

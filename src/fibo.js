@@ -13,5 +13,5 @@ function fibo(n) {
 	return cache[n];
 }
 console.time('checkpoint');
-console.log('result: ' + fibo(39));
+console.log('JS result: ' + fibo(39));
 console.timeEnd('checkpoint');
