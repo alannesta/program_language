@@ -20,12 +20,12 @@ var config = {
 		cwd: './src'
 	},
 	java: {
-		command: 'java -cp Fibonacci',
+		command: 'javac -d ./ ../src/Fibonacci.java && java -cp ./ Fibonacci',
 		target: '',
 		cwd: './bin'
 	},
 	c: {
-		command: './fibo_c',
+		command: 'gcc -o ./fibo_c ../src/fibo.c && ./fibo_c',
 		target: '',
 		cwd: './bin'
 	}
@@ -34,8 +34,19 @@ var config = {
 for (var key in config) {
 	jobQueue.push(createTask(config[key]));
 }
-jobQueue[0]().then(jobQueue[1]).then(jobQueue[2]);
-//jobQueue[0]();
+//jobQueue[0]().then(jobQueue[1]).then(jobQueue[2]).then(jobQueue[3]).then(jobQueue[4]);
+//jobQueue[4]();
+
+var start = Q.defer();
+var task_in_progress  = Q.when(start.promise);
+
+// it would be better to use async for brevity
+jobQueue.forEach(function(nextTask) {
+	task_in_progress = task_in_progress.then(nextTask);
+});
+
+start.resolve('gg');
+
 
 function createTask(task) {
 	return function() {
@@ -56,17 +67,3 @@ function cb(deferred) {
 		deferred.resolve();
 	}
 }
-
-
-//python = exec('python fibo.py', {
-//	cwd: './src'
-//}, function(error, stdout) {
-//	if (error) {
-//		console.log(error);
-//	}
-//	console.log(stdout);
-//});
-//
-//python.on('close', function(code) {
-//	console.log('Python process close with code: ' + code)
-//});

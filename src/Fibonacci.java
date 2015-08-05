@@ -21,6 +21,6 @@ public class Fibonacci {
 		Fibonacci fibo = new Fibonacci();
 		long timeFlag = System.currentTimeMillis();
 		System.out.println(fibo.fibo(31));
-		System.out.println("Time elapsed: " + (System.currentTimeMillis() - timeFlag) + "ms");
+		System.out.println("Java Time elapsed: " + (System.currentTimeMillis() - timeFlag) + "ms");
 	}
 }

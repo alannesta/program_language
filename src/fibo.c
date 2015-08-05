@@ -29,6 +29,6 @@ int main() {
 	elapsed = (double)(end-begin) / CLOCKS_PER_SEC;
 	int timeuse = (1000000 * ( finish.tv_sec - start.tv_sec ) + finish.tv_usec -start.tv_usec) / 1000;
 
-    printf("Time used: %d ms\n", timeuse);
-	printf("Time elapsed: %ld s\n", elapsed);
+    printf("C ---> Time used: %d ms\n", timeuse);
+//	printf("Time elapsed: %ld s\n", elapsed);
 }
