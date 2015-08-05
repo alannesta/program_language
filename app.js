@@ -32,19 +32,20 @@ var config = {
 };
 
 for (var key in config) {
-	jobQueue.push(function() {
-		return function() {
-			var deferred = Q.defer();
-			exec(config[key].command, {
-				cwd: config[key].cwd
-			}, cb(deferred));
-			return deferred.promise;
-		}
-	}());
+	jobQueue.push(createTask(config[key]));
 }
+jobQueue[0]().then(jobQueue[1]).then(jobQueue[2]);
+//jobQueue[0]();
 
-//jobQueue[1]().then(jobQueue[2]).then(jobQueue[3]);
-jobQueue[2]();
+function createTask(task) {
+	return function() {
+		var deferred = Q.defer();
+		exec(task.command, {
+			cwd: task.cwd
+		}, cb(deferred));
+		return deferred.promise;
+	}
+}
 
 function cb(deferred) {
 	return function(error, stdout) {

@@ -39,7 +39,7 @@ class FiboTest
 end
 
 fibo = FiboTest.new
-puts fibo.cache_instance
+# puts fibo.cache_instance
 
 t1 = Time.now
 # puts fibo.fibo(40)	# using instance method
