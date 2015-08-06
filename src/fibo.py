@@ -3,10 +3,9 @@ import time, sys
 #cache = {}	# python dictionary
 cache = dict()
 
-def fibo(n):
-
-	# if (n in cache):	# if (cache[n] is not None) will throw an exception in python
-	# 	return cache[n]
+def fiboCached(n):
+	if (n in cache):	# if (cache[n] is not None) will throw an exception in python
+		return cache[n]
 	if (n == 1):
 		return 1
 	if (n == 0):
@@ -15,6 +14,14 @@ def fibo(n):
 	cache[n] = fibo(n-1) + fibo(n-2)
 	return cache[n]
 
+def fibo(n):
+
+	if (n == 1):
+		return 1
+	if (n == 0):
+		return 0
+	
+	return fibo(n-1) + fibo(n-2)
 
 def main():
 	now = time.time()
