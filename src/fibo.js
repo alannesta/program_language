@@ -13,5 +13,8 @@ function fibo(n) {
 	return cache[n];
 }
 console.time('JS checkpoint');
-console.log('JS result: ' + fibo(39));
+
+var arg = process.argv[2] ? process.argv[2]: 30;
+console.log('JS --> fibonacci ' + arg +' result: ' + fibo(arg));
+
 console.timeEnd('JS checkpoint');

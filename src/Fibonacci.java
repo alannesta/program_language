@@ -19,8 +19,12 @@ public class Fibonacci {
 	}
 	public static void main(String[] args) {
 		Fibonacci fibo = new Fibonacci();
+		int arg = 30;
 		long timeFlag = System.currentTimeMillis();
-		System.out.println(fibo.fibo(31));
-		System.out.println("Java Time elapsed: " + (System.currentTimeMillis() - timeFlag) + "ms");
+		if (args.length > 0) {
+			arg = Integer.parseInt(args[0]);
+		}
+		System.out.println(fibo.fibo(arg));
+		System.out.println("Java Fibonacci: " + arg + ", Time elapsed: " + (System.currentTimeMillis() - timeFlag) + "ms");
 	}
 }

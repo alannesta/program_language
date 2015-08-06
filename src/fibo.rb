@@ -42,7 +42,11 @@ fibo = FiboTest.new
 # puts fibo.cache_instance
 
 t1 = Time.now
+arg = 30
+if !ARGV[0].nil? then
+	arg = ARGV[0].to_i
+end
 # puts fibo.fibo(40)	# using instance method
-puts FiboTest.fibo(40)	# using class method
+puts FiboTest.fibo(arg)	# using class method
 t2 = Time.now
-puts "Ruby: Time elapsed #{t2-t1}"
+puts "Ruby Fibonacci #{arg}, Time elapsed #{t2-t1}"

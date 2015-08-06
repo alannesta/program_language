@@ -1,4 +1,4 @@
-import time
+import time, sys
 
 #cache = {}	# python dictionary
 cache = dict()
@@ -18,8 +18,14 @@ def fibo(n):
 
 def main():
 	now = time.time()
-	print(fibo(35))
-	print 'Python: Time elapsed: {0} milli seconds'.format((time.time() - now)*1000)
+
+	if (len(sys.argv) > 1):
+		arg = int(sys.argv[1])
+	else:
+		arg = 30
+
+	print(fibo(arg));
+	print 'Python Fibonacci ' + str(arg) + ': Time elapsed: {0} milli seconds'.format((time.time() - now)*1000)
 
 if __name__ == "__main__":
 	main()

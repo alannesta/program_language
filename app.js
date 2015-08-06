@@ -2,30 +2,31 @@ var exec = require('child_process').exec;
 var Q = require('q');
 var jobQueue = [];
 
+var fibonacci = 35;
 
 var config = {
 	python: {
-		command: 'python fibo.py',
+		command: 'python fibo.py ' + fibonacci,
 		target: 'fibo.py',
 		cwd: './src'
 	},
 	ruby: {
-		command: 'ruby fibo.rb',
+		command: 'ruby fibo.rb ' + fibonacci,
 		target: 'fibo.rb',
 		cwd: './src'
 	},
 	javascript: {
-		command: 'node fibo.js',
+		command: 'node fibo.js ' + fibonacci,
 		target: 'fibo.js',
 		cwd: './src'
 	},
 	java: {
-		command: 'javac -d ./ ../src/Fibonacci.java && java -cp ./ Fibonacci',
+		command: 'javac -d ./ ../src/Fibonacci.java && java -cp ./ Fibonacci ' + fibonacci,
 		target: '',
 		cwd: './bin'
 	},
 	c: {
-		command: 'gcc -o ./fibo_c ../src/fibo.c && ./fibo_c',
+		command: 'gcc -o ./fibo_c ../src/fibo.c && ./fibo_c ' + fibonacci,
 		target: '',
 		cwd: './bin'
 	}
@@ -46,7 +47,6 @@ jobQueue.forEach(function(nextTask) {
 });
 
 start.resolve('gg');
-
 
 function createTask(task) {
 	return function() {
