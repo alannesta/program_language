@@ -2,7 +2,7 @@ var exec = require('child_process').exec;
 var Q = require('q');
 var jobQueue = [];
 
-var fibonacci = 35;
+var fibonacci = 39;
 
 var config = {
 	python: {
@@ -26,7 +26,7 @@ var config = {
 		cwd: './bin'
 	},
 	c: {
-		command: 'gcc -o ./fibo_c ../src/fibo.c && ./fibo_c ' + fibonacci,
+		command: 'gcc -O2 -o ./fibo_c ../src/fibo.c && ./fibo_c ' + fibonacci,
 		target: '',
 		cwd: './bin'
 	}
