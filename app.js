@@ -1,8 +1,11 @@
 var exec = require('child_process').exec;
 var Q = require('q');
 var jobQueue = [];
+var benchmark_result = [];
 
-var fibonacci = 39;
+var fibonacci = 33;
+
+var time_reg = /(\d+\.{0,1}\d{0,10})\s{0,1}ms/;	// the regx to extract time info from stdout
 
 var config = {
 	python: {
@@ -46,6 +49,10 @@ jobQueue.forEach(function(nextTask) {
 	task_in_progress = task_in_progress.then(nextTask);
 });
 
+task_in_progress.then(function() {
+	console.log(benchmark_result);
+});
+
 start.resolve('gg');
 
 function createTask(task) {
@@ -64,6 +71,14 @@ function cb(deferred) {
 			console.log(error);
 		}
 		console.log(stdout);
+		benchmark_result.push(Math.floor(parseTime(stdout)));
 		deferred.resolve();
 	}
 }
+
+function parseTime(stdout) {
+	//var time_used = stdout.match(time_reg);
+	return time_reg.exec(stdout)[1];
+	//console.log(time_used[1]);
+}
+

@@ -59,4 +59,5 @@ end
 # puts fibo.fibo(40)	# using instance method
 puts FiboTest.fibo(arg)	# using class method
 t2 = Time.now
-puts "Ruby Fibonacci #{arg}, Time elapsed #{(t2-t1)*1000} ms"
+elapsed = '%.2f' % ((t2-t1)*1000)
+puts "Ruby Fibonacci #{arg}, Time elapsed #{elapsed} ms"

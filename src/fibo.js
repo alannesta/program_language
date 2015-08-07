@@ -23,9 +23,9 @@ function fibo(n) {
 	return fibo(n-1) + fibo(n-2);
 }
 
-console.time('JS checkpoint');
+console.time('Javascript checkpoint');
 
 var arg = process.argv[2] ? process.argv[2]: 30;
-console.log('JS --> fibonacci ' + arg +' result: ' + fibo(arg));
+console.log('Javascript --> fibonacci ' + arg +' result: ' + fibo(arg));
 
-console.timeEnd('JS checkpoint');
+console.timeEnd('Javascript checkpoint');

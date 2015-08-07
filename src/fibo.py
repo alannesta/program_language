@@ -32,7 +32,9 @@ def main():
 		arg = 30
 
 	print(fibo(arg));
-	print 'Python Fibonacci ' + str(arg) + ': Time elapsed: {0} milli seconds'.format((time.time() - now)*1000)
+
+	time_elpased = "{0:.2f}".format((time.time()-now)*1000)		# format float
+	print 'Python Fibonacci ' + str(arg) + ': Time elapsed: {0} ms'.format(time_elpased)
 
 if __name__ == "__main__":
 	main()
