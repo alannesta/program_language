@@ -1,11 +1,12 @@
 var exec = require('child_process').exec;
 var Q = require('q');
 var jobQueue = [];
-var benchmark_result = [];
+var benchmark_result = {};
 
-var fibonacci = 33;
+var fibonacci = 38;
 
 var time_reg = /(\d+\.{0,1}\d{0,10})\s{0,1}ms/;	// the regx to extract time info from stdout
+var language_reg = /(Javascript)|(Python)|(Ruby)|(Java)|(C)/;
 
 var config = {
 	python: {
@@ -71,7 +72,14 @@ function cb(deferred) {
 			console.log(error);
 		}
 		console.log(stdout);
-		benchmark_result.push(Math.floor(parseTime(stdout)));
+		//benchmark_result.push(Math.floor(parseTime(stdout)));
+		//parseLang(stdout);
+		var lang = parseLang(stdout);
+		var time = Math.floor(parseTime(stdout));
+
+		if(lang !== undefined && time !== undefined) {
+			benchmark_result[lang] = time;
+		}
 		deferred.resolve();
 	}
 }
@@ -81,4 +89,9 @@ function parseTime(stdout) {
 	return time_reg.exec(stdout)[1];
 	//console.log(time_used[1]);
 }
+
+function parseLang(stdout) {
+	return language_reg.exec(stdout)[0];
+}
+
 
