@@ -1,104 +1,144 @@
 var exec = require('child_process').exec;
 var Q = require('q');
 var path = require('path');
-var jobQueue = [];
 var benchmark_result = {};
+var trigger;
 
-var fibonacci = 35;
+var fibonacci = 32;
 
 var time_reg = /(\d+\.{0,1}\d{0,10})\s{0,1}ms/;	// the regx to extract time info from stdout
 var language_reg = /(Javascript)|(Python)|(Ruby)|(Java)|(C)/;
 
 var config = {
-	python: {
-		command: 'python fibo.py ' + fibonacci,
-		target: 'fibo.py',
-		cwd: path.join(__dirname, 'src')
-	},
-	ruby: {
-		command: 'ruby fibo.rb ' + fibonacci,
-		target: 'fibo.rb',
-		cwd: path.join(__dirname, 'src')
-	},
-	javascript: {
-		command: 'node fibo.js ' + fibonacci,
-		target: 'fibo.js',
-		cwd: path.join(__dirname, 'src')
-	},
-	java: {
-		command: 'javac -d ./ ../src/Fibonacci.java && java -cp ./ Fibonacci ' + fibonacci,
-		target: '',
-		cwd: path.join(__dirname, 'bin')
-	},
-	c: {
-		command: 'gcc -O2 -o ./fibo_c ../src/fibo.c && ./fibo_c ' + fibonacci,
-		target: '',
-		cwd: path.join(__dirname, 'bin')
-	}
+    python: {
+        command: 'python fibo.py ' + fibonacci,
+        target: 'fibo.py',
+        cwd: path.join(__dirname, 'src')
+    },
+    ruby: {
+        command: 'ruby fibo.rb ' + fibonacci,
+        target: 'fibo.rb',
+        cwd: path.join(__dirname, 'src')
+    },
+    javascript: {
+        command: 'node fibo.js ' + fibonacci,
+        target: 'fibo.js',
+        cwd: path.join(__dirname, 'src')
+    },
+    java: {
+        command: 'javac -d ./ ../src/Fibonacci.java && java -cp ./ Fibonacci ' + fibonacci,
+        target: '',
+        cwd: path.join(__dirname, 'bin')
+    },
+    c: {
+        command: 'gcc -O2 -o ./fibo_c ../src/fibo.c && ./fibo_c ' + fibonacci,
+        target: '',
+        cwd: path.join(__dirname, 'bin')
+    }
 };
 
+/**
+ * Exposed interfaces
+ */
 
-var kickStart = function() {
-	for (var key in config) {
-		jobQueue.push(createTask(config[key]));
-	}
-//jobQueue[0]().then(jobQueue[1]).then(jobQueue[2]).then(jobQueue[3]).then(jobQueue[4]);
-//jobQueue[4]();
 
-	var start = Q.defer();
-	var task_in_progress  = Q.when(start.promise);
+function asyncTaskChain(serverFn) {
+    // reset benchmark_result
+    benchmark_result = {};
+    var jobQueue = [];
 
-// it would be better to use async for brevity
-	jobQueue.forEach(function(nextTask) {
-		task_in_progress = task_in_progress.then(nextTask);
-	});
-
-	task_in_progress.then(function() {
-		console.log(benchmark_result);
-	});
-
-	start.resolve('kick start job');
-};
-
-function createTask(task) {
-	return function() {
-		var deferred = Q.defer();
-		exec(task.command, {
-			cwd: task.cwd
-		}, cb(deferred));
-		return deferred.promise;
-	}
+    for (var key in config) {
+        jobQueue.push(createAsyncTask(config[key], serverFn));
+    }
+    return jobQueue;
 }
 
-function cb(deferred) {
-	return function(error, stdout) {
-		if (error) {
-			console.log(error);
-		}
-		console.log(stdout);
-		//benchmark_result.push(Math.floor(parseTime(stdout)));
-		//parseLang(stdout);
-		var lang = parseLang(stdout);
-		var time = Math.floor(parseTime(stdout));
+function promiseJobQueue() {
+    trigger = Q.defer();
+    var task_in_progress  = Q.when(trigger.promise);
 
-		if(lang !== undefined && time !== undefined) {
-			benchmark_result[lang] = time;
-		}
-		deferred.resolve();
-	}
+    jobQueue.forEach(function(nextTask) {
+        task_in_progress = task_in_progress.then(nextTask);
+    });
+
+    return task_in_progress;
+}
+
+
+// return the trigger to kick start the promise chain
+function getTrigger() {
+    return trigger;
+}
+
+/**
+ * Helper functions
+ */
+
+/**
+ * @description create a job in for async.series to consume
+ * @param task
+ * @param serverFn	The function to be executed when the node.exec job is done
+ * @returns {Function}
+ */
+function createAsyncTask(task, serverFn) {
+    return function(callback) {
+        exec(task.command, {
+            cwd: task.cwd
+        }, function(error, stdout) {
+            var lang = parseLang(stdout);
+            var time = Math.floor(parseTime(stdout));
+
+            if(lang !== undefined && time !== undefined) {
+                benchmark_result[lang] = time;
+            }
+            serverFn(benchmark_result);
+            if(error) {
+                callback(error);
+            }else {
+                callback(null);
+            }
+        });
+    }
+}
+
+function createTask(task) {
+    return function() {
+        var deferred = Q.defer();
+        exec(task.command, {
+            cwd: task.cwd
+        }, cb(deferred));
+        return deferred.promise;
+    }
+}
+
+
+function cb(deferred) {
+    return function(error, stdout) {
+        if (error) {
+            console.log(error);
+        }
+        console.log(stdout);
+        //benchmark_result.push(Math.floor(parseTime(stdout)));
+        //parseLang(stdout);
+        var lang = parseLang(stdout);
+        var time = Math.floor(parseTime(stdout));
+
+        if(lang !== undefined && time !== undefined) {
+            benchmark_result[lang] = time;
+        }
+        deferred.resolve(benchmark_result);
+    }
 }
 
 function parseTime(stdout) {
-	//var time_used = stdout.match(time_reg);
-	return time_reg.exec(stdout)[1];
-	//console.log(time_used[1]);
+    //var time_used = stdout.match(time_reg);
+    return time_reg.exec(stdout)[1];
+    //console.log(time_used[1]);
 }
 
 function parseLang(stdout) {
-	return language_reg.exec(stdout)[0];
+    return language_reg.exec(stdout)[0];
 }
 
-//kickStart();
-
-module.exports = kickStart;
-
+exports.promiseJobQueue = promiseJobQueue;
+exports.asyncTaskChain = asyncTaskChain;
