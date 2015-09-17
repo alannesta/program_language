@@ -4,7 +4,7 @@ var path = require('path');
 var jobQueue = [];
 var benchmark_result = {};
 
-var fibonacci = 38;
+var fibonacci = 35;
 
 var time_reg = /(\d+\.{0,1}\d{0,10})\s{0,1}ms/;	// the regx to extract time info from stdout
 var language_reg = /(Javascript)|(Python)|(Ruby)|(Java)|(C)/;
@@ -38,7 +38,6 @@ var config = {
 };
 
 
-
 var kickStart = function() {
 	for (var key in config) {
 		jobQueue.push(createTask(config[key]));
@@ -58,7 +57,7 @@ var kickStart = function() {
 		console.log(benchmark_result);
 	});
 
-	start.resolve('gg');
+	start.resolve('kick start job');
 };
 
 function createTask(task) {
@@ -99,7 +98,7 @@ function parseLang(stdout) {
 	return language_reg.exec(stdout)[0];
 }
 
-kickStart();
+//kickStart();
 
 module.exports = kickStart;
 
