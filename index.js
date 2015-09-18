@@ -37,7 +37,7 @@ function runBenchmark(serverFn) {
         }
     });
 
-    return deferred;
+    return deferred.promise;
 }
 
 /**
