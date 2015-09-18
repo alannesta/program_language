@@ -4,39 +4,12 @@ var path = require('path');
 var benchmark_result = {};
 var async = require('async');
 var fs = require('fs');
-
-var fibonacci = 32;
+var path = require('path');
 
 var time_reg = /(\d+\.{0,1}\d{0,10})\s{0,1}ms/;	// the regx to extract time info from stdout
 var language_reg = /(Javascript)|(Python)|(Ruby)|(Java)|(C)/;
 
-var config = {
-    python: {
-        command: 'python fibo.py ' + fibonacci,
-        target: 'fibo.py',
-        cwd: path.join(__dirname, 'src')
-    },
-    ruby: {
-        command: 'ruby fibo.rb ' + fibonacci,
-        target: 'fibo.rb',
-        cwd: path.join(__dirname, 'src')
-    },
-    javascript: {
-        command: 'node fibo.js ' + fibonacci,
-        target: 'fibo.js',
-        cwd: path.join(__dirname, 'src')
-    },
-    java: {
-        command: 'javac -d ./ ../src/Fibonacci.java && java -cp ./ Fibonacci ' + fibonacci,
-        target: '',
-        cwd: path.join(__dirname, 'bin')
-    },
-    c: {
-        command: 'gcc -O2 -o ./fibo_c ../src/fibo.c && ./fibo_c ' + fibonacci,
-        target: '',
-        cwd: path.join(__dirname, 'bin')
-    }
-};
+var config = {};
 
 /**
  * Exposed interfaces
@@ -45,8 +18,7 @@ var config = {
 
 function runBenchmark(serverFn) {
 
-    ensureDirectoryExists('./bin');
-
+    ensureDirectoryExists(path.join(__dirname, 'bin'));
     // reset benchmark_result
     benchmark_result = {};
     var deferred = Q.defer();
@@ -96,8 +68,34 @@ function ensureDirectoryExists(path, mask, callback) {
     });
 }
 
-function setFibo(fibo) {
-    fibonacci = fibo;
+function setFibo(fibonacci) {
+    config = {
+        python: {
+            command: 'python fibo.py ' + fibonacci,
+            target: 'fibo.py',
+            cwd: path.join(__dirname, 'src')
+        },
+        ruby: {
+            command: 'ruby fibo.rb ' + fibonacci,
+            target: 'fibo.rb',
+            cwd: path.join(__dirname, 'src')
+        },
+        javascript: {
+            command: 'node fibo.js ' + fibonacci,
+            target: 'fibo.js',
+            cwd: path.join(__dirname, 'src')
+        },
+        java: {
+            command: 'javac -d ./ ../src/Fibonacci.java && java -cp ./ Fibonacci ' + fibonacci,
+            target: '',
+            cwd: path.join(__dirname, 'bin')
+        },
+        c: {
+            command: 'gcc -O2 -o ./fibo_c ../src/fibo.c && ./fibo_c ' + fibonacci,
+            target: '',
+            cwd: path.join(__dirname, 'bin')
+        }
+    };
 }
 
 /**
