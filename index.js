@@ -2,7 +2,8 @@ var exec = require('child_process').exec;
 var Q = require('q');
 var path = require('path');
 var benchmark_result = {};
-var trigger;
+var async = require('async');
+var fs = require('fs');
 
 var fibonacci = 32;
 
@@ -42,32 +43,29 @@ var config = {
  */
 
 
-function asyncTaskChain(serverFn) {
+function runBenchmark(serverFn) {
+
+    ensureDirectoryExists('./bin');
+
     // reset benchmark_result
     benchmark_result = {};
+    var deferred = Q.defer();
+
     var jobQueue = [];
 
     for (var key in config) {
         jobQueue.push(createAsyncTask(config[key], serverFn));
     }
-    return jobQueue;
-}
 
-function promiseJobQueue() {
-    trigger = Q.defer();
-    var task_in_progress  = Q.when(trigger.promise);
-
-    jobQueue.forEach(function(nextTask) {
-        task_in_progress = task_in_progress.then(nextTask);
+    async.series(jobQueue, function (err) {
+        if (err) {
+            deferred.reject('task failed');
+        } else {
+            deferred.resolve();
+        }
     });
 
-    return task_in_progress;
-}
-
-
-// return the trigger to kick start the promise chain
-function getTrigger() {
-    return trigger;
+    return deferred;
 }
 
 /**
@@ -75,34 +73,71 @@ function getTrigger() {
  */
 
 /**
+ * Init module folder structure
+ */
+
+function ensureDirectoryExists(path, mask, callback) {
+    if (typeof mask == 'function') { // allow the `mask` parameter to be optional
+        callback = mask;
+        mask = 0777;
+    }
+    if (!callback) {
+        callback = function() {
+            console.log(Array.prototype.slice.call(arguments));
+        }
+    }
+    fs.mkdir(path, mask, function (err) {
+        if (err) {
+            if (err.code == 'EEXIST') callback(null); // ignore the error if the folder already exists
+            else cb(err); // something else went wrong
+        } else {
+            callback(null); // successfully created folder
+        }
+    });
+}
+
+function setFibo(fibo) {
+    fibonacci = fibo;
+}
+
+/**
  * @description create a job in for async.series to consume
  * @param task
- * @param serverFn	The function to be executed when the node.exec job is done
+ * @param serverFn    The function to be executed when the node.exec job is done
  * @returns {Function}
  */
 function createAsyncTask(task, serverFn) {
-    return function(callback) {
+    return function (callback) {
         exec(task.command, {
             cwd: task.cwd
-        }, function(error, stdout) {
+        }, function (error, stdout) {
             var lang = parseLang(stdout);
             var time = Math.floor(parseTime(stdout));
 
-            if(lang !== undefined && time !== undefined) {
+            if (lang !== undefined && time !== undefined) {
                 benchmark_result[lang] = time;
             }
-            serverFn(benchmark_result);
-            if(error) {
+
+            if (serverFn) {
+                serverFn(benchmark_result);
+            }
+
+            if (error) {
                 callback(error);
-            }else {
+            } else {
                 callback(null);
             }
         });
     }
 }
 
+/**
+ * @description normal task creation which retruns a promise
+ * @param task
+ * @returns {Function}
+ */
 function createTask(task) {
-    return function() {
+    return function () {
         var deferred = Q.defer();
         exec(task.command, {
             cwd: task.cwd
@@ -113,7 +148,7 @@ function createTask(task) {
 
 
 function cb(deferred) {
-    return function(error, stdout) {
+    return function (error, stdout) {
         if (error) {
             console.log(error);
         }
@@ -123,7 +158,7 @@ function cb(deferred) {
         var lang = parseLang(stdout);
         var time = Math.floor(parseTime(stdout));
 
-        if(lang !== undefined && time !== undefined) {
+        if (lang !== undefined && time !== undefined) {
             benchmark_result[lang] = time;
         }
         deferred.resolve(benchmark_result);
@@ -140,5 +175,5 @@ function parseLang(stdout) {
     return language_reg.exec(stdout)[0];
 }
 
-exports.promiseJobQueue = promiseJobQueue;
-exports.asyncTaskChain = asyncTaskChain;
+exports.runBenchmark = runBenchmark;
+exports.setFibo = setFibo;
