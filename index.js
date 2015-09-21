@@ -31,8 +31,10 @@ function runBenchmark(serverFn) {
 
     async.series(jobQueue, function (err) {
         if (err) {
+            console.log(err);
             deferred.reject('task failed');
         } else {
+            console.log('async resolve');
             deferred.resolve();
         }
     });
